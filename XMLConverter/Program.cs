@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
