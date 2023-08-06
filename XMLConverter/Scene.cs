@@ -41,15 +41,15 @@ public class Actor
 {
     public string Type { get; set; } = "npc";
     public string IntendedSex { get; set; } = "any";
-    public int SosBed { get; set; }
+    public int SosBend { get; set; }
     public float Scale { get; set; }
     public float ScaleHeight { get; set; } = 120.748f;
     public int ExpressionAction { get; set; }
-    public int Lookup { get; set; }
+    public int LookUp { get; set; }
     public int LookDown { get; set; }
     public int LookLeft { get; set; }
     public int LookRight { get; set; }
-    public List<string> Tags { get; set; }
+    public List<string> Tags { get; set; } = new List<string>();
     public bool FeetOnGround { get; set; }
     public Dictionary<string, string> AutoTransitions { get; } = new Dictionary<string, string>();
 }
