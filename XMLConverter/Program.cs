@@ -51,7 +51,7 @@ foreach (var file in files)
     {
         var scene = new Scene();
         var sceneTag = doc["scene"];
-        scene.Name = sceneTag["info"]?.Attributes["name"]?.Value ?? doc["scene"]?.Attributes["id"]?.Value!;
+        scene.Name = sceneTag!["info"]!.Attributes["name"]?.Value ?? doc["scene"]?.Attributes["id"]?.Value!;
         //TODO: ModPack - Animator name?
         scene.Length = Convert.ToSingle(sceneTag["anim"]?.Attributes["l"]?.Value);
         //TODO: Handle Destination/Origin
@@ -73,9 +73,9 @@ foreach (var file in files)
                         if (option is not { Name: "option" }) continue;
                         scene.Navigations.Add(new Navigation()
                         {
-                            Destination = option.Attributes["go"].Value,
+                            Destination = option!.Attributes!["go"]?.Value,
                             //TODO: Convert navigation texts
-                            Description = option.Attributes["text"].Value
+                            Description = option!.Attributes["text"].Value
                         });
                     }
                 }
@@ -84,13 +84,15 @@ foreach (var file in files)
 
         if (sceneTag["speed"] != null)
         {
-            for (var i = 0; i < sceneTag["speed"].ChildNodes.Count; i++)
+            for (var i = 0; i < sceneTag["speed"]!.ChildNodes.Count; i++)
             {
-                var sp = sceneTag["speed"].ChildNodes.Item(i);
+                var sp = sceneTag["speed"]!.ChildNodes.Item(i);
+                if (sp == null) continue;
                 var anim = sp["anim"];
+                if(anim == null) continue;
                 var speed = new Speed()
                 {
-                    Animation = anim.Attributes["id"].Value,
+                    Animation = anim!.Attributes?["id"]?.Value,
                     DisplaySpeed = Convert.ToSingle(sp.Attributes["qnt"].Value),
                     PlaybackSpeed = 1.0f
                 };
