@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Xml;
@@ -16,8 +17,8 @@ if (args.Length < 1)
 else
 {
     inputPath = args[0];
-   
 }
+
 outputPath = inputPath;
 if (args.Length < 2)
 {
@@ -36,7 +37,7 @@ var scenes = new Dictionary<string, Scene>();
 foreach (var file in files)
 {
     Console.WriteLine($"Loading {file}");
-    
+
     XmlDocument doc = new XmlDocument();
     try
     {
@@ -57,12 +58,12 @@ foreach (var file in files)
         //TODO: Handle Destination/Origin
         if (sceneTag["nav"] != null)
         {
-            for(var i = 0; i <sceneTag["nav"]?.ChildNodes.Count; i ++)
+            for (var i = 0; i < sceneTag["nav"]?.ChildNodes.Count; i++)
             {
                 var tab = sceneTag["nav"]!.ChildNodes.Item(i);
-                
+
                 if (tab is not { Name: "tab" }) continue;
-                
+
                 for (var j = 0; j < tab.ChildNodes.Count; j++)
                 {
                     var page = tab.ChildNodes.Item(j);
@@ -76,19 +77,48 @@ foreach (var file in files)
                             Destination = option.Attributes["go"].Value,
                             //TODO: Convert navigation texts
                             Description = option.Attributes["text"].Value
-                                
                         });
                     }
                 }
             }
         }
 
-        if (doc["metadata"] != null && doc["metadata"]?.Attributes["tags"] != null)
+        if (sceneTag["speed"] != null)
         {
-            scene.Tags.AddRange(doc["metadata"]!.Attributes["tags"].Value.Split(','));
+            for (var i = 0; i < sceneTag["speed"].ChildNodes.Count; i++)
+            {
+                var sp = sceneTag["speed"].ChildNodes.Item(i);
+                var anim = sp["anim"];
+                var speed = new Speed()
+                {
+                    Animation = anim.Attributes["id"].Value,
+                    DisplaySpeed = Convert.ToSingle(sp.Attributes["qnt"].Value),
+                    PlaybackSpeed = 1.0f
+                };
+                scene.Speeds.Add(speed);
+            }
         }
-        
-        
+
+        if (sceneTag["metadata"] != null)
+        {
+            var metadata = sceneTag["metadata"];
+            if (metadata?.Attributes["tags"] != null)
+            {
+                scene.Tags.AddRange(metadata!.Attributes["tags"].Value.Split(','));    
+            }
+
+            if (metadata.Attributes["noRandomSelection"] != null)
+            {
+                scene.NoRandomSelection = metadata.Attributes["noRandomSelection"].Value == "1";
+            }
+
+            if (metadata.Attributes["furniture"] != null)
+            {
+                scene.Furniture = metadata.Attributes["furniture"].Value;
+            }
+        }
+
+
         scenes.Add(file, scene);
     }
     else
@@ -98,13 +128,12 @@ foreach (var file in files)
 }
 
 
-
 //Write object to Json
 
 
 foreach (var (k, v) in scenes)
 {
-    var path = Path.Combine(outputPath,$"{Path.GetFileNameWithoutExtension(k)}.json");
+    var path = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(k)}.json");
     Console.WriteLine($"Writing {path}");
     var jsonString = JsonSerializer.Serialize(v, new JsonSerializerOptions()
     {
