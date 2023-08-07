@@ -56,9 +56,10 @@ foreach (var file in files)
             var sceneTag = doc["scene"];
             if (sceneTag == null) continue;
             var infoTag = sceneTag["info"];
+            var id = sceneTag.Attributes["id"].Value;
             scene.Name = infoTag?.Attributes["name"]?.Value ?? sceneTag.Attributes["id"]?.Value!;
             scene.ModPack = modPackName ?? modPackPattern.Match(file).Groups["pack"].Value ?? "";
-            
+
             scene.Length = Convert.ToSingle(sceneTag["anim"]?.Attributes["l"]?.Value);
             if (sceneTag["anim"]?.Attributes?["t"] != null)
             {
@@ -67,6 +68,7 @@ foreach (var file in files)
                     scene.Destination = sceneTag["anim"].Attributes["dest"].Value;
                 }
             }
+
             var navTag = sceneTag["nav"];
             if (navTag != null)
             {
@@ -234,7 +236,7 @@ foreach (var file in files)
                 }
             }
 
-            scenes.Add(file, scene);
+            scenes.Add(id, scene);
         }
         else
         {
@@ -250,18 +252,24 @@ foreach (var file in files)
 
 //Write object to Json
 
-
 foreach (var (k, v) in scenes)
 {
-    var path = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(k)}.json");
-    Console.WriteLine($"Writing {path}");
-    var jsonString = JsonSerializer.Serialize(v, new JsonSerializerOptions()
+    try
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true
-    });
-    File.WriteAllText(path, jsonString);
+        var path = Path.Combine(outputPath, $"{Path.GetFileNameWithoutExtension(k)}.json");
+        Console.WriteLine($"Writing {path}");
+        var jsonString = JsonSerializer.Serialize(v, new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true
+        });
+        File.WriteAllText(path, jsonString);
+    }
+    catch (Exception ex)
+    {
+        errors.Add($"{k} : {ex.Message}");
+    }
 }
 
 //output errors
