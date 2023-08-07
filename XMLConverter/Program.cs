@@ -1,8 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Xml;
 using XMLConverter;
 
@@ -30,6 +30,13 @@ if (args.Length < 2)
     }
 }
 
+string? modPackName = null;
+if (args.Length >= 3)
+{
+    modPackName = args[3];
+}
+
+Regex modPackPattern = new Regex(@"scene[\\/](?<pack>\w+)[\\/]");
 var errors = new List<string>();
 //Grab XMLS
 var files = Directory.GetFiles(inputPath, "*.xml", new EnumerationOptions() { RecurseSubdirectories = true });
@@ -50,9 +57,16 @@ foreach (var file in files)
             if (sceneTag == null) continue;
             var infoTag = sceneTag["info"];
             scene.Name = infoTag?.Attributes["name"]?.Value ?? sceneTag.Attributes["id"]?.Value!;
-            //TODO: ModPack - Animator name?
+            scene.ModPack = modPackName ?? modPackPattern.Match(file).Groups["pack"].Value ?? "";
+            
             scene.Length = Convert.ToSingle(sceneTag["anim"]?.Attributes["l"]?.Value);
-            //TODO: Handle Destination/Origin
+            if (sceneTag["anim"]?.Attributes?["t"] != null)
+            {
+                if (sceneTag["anim"].Attributes["t"].Value == "T" && sceneTag["anim"].Attributes["dest"] != null)
+                {
+                    scene.Destination = sceneTag["anim"].Attributes["dest"].Value;
+                }
+            }
             var navTag = sceneTag["nav"];
             if (navTag != null)
             {
@@ -93,7 +107,7 @@ foreach (var file in files)
                     {
                         Animation = anim!.Attributes?["id"]?.Value,
                         DisplaySpeed = Convert.ToSingle(sp.Attributes["qnt"].Value),
-                        PlaybackSpeed = 1.0f
+                        PlaybackSpeed = Convert.ToSingle(anim?.Attributes?["playbackspeed"]?.Value ?? "1.0")
                     };
                     scene.Speeds.Add(speed);
                 }
