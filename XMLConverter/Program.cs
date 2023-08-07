@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using XMLConverter;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Welcome to the OStim XML Converter");
 var inputPath = "";
 var outputPath = "";
 if (args.Length < 1)
