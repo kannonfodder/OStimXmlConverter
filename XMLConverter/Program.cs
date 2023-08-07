@@ -66,7 +66,7 @@ foreach (var file in files)
                 if (sceneTag["anim"].Attributes["t"].Value == "T" && sceneTag["anim"].Attributes["dest"] != null)
                 {
                     scene.Destination = sceneTag["anim"].Attributes["dest"].Value.Replace("|","_");
-                }
+                } 
             }
 
             var navTag = sceneTag["nav"];
@@ -112,6 +112,19 @@ foreach (var file in files)
                         PlaybackSpeed = Convert.ToSingle(anim?.Attributes?["playbackspeed"]?.Value ?? "1.0")
                     };
                     scene.Speeds.Add(speed);
+                }
+            }
+
+            if (scene.Speeds.Count == 0)
+            {
+                if (sceneTag["anim"].Attributes["t"].Value == "L")
+                {
+                    scene.Speeds.Add(new Speed()
+                    {
+                        Animation = sceneTag["anim"].Attributes["id"].Value,
+                        PlaybackSpeed = 1.0f,
+                        DisplaySpeed = 1.0f
+                    });
                 }
             }
 
