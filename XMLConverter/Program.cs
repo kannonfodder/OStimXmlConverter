@@ -56,7 +56,7 @@ foreach (var file in files)
             var sceneTag = doc["scene"];
             if (sceneTag == null) continue;
             var infoTag = sceneTag["info"];
-            var id = sceneTag.Attributes["id"].Value;
+            var id = sceneTag.Attributes["id"].Value.Replace("|","_");
             scene.Name = infoTag?.Attributes["name"]?.Value ?? sceneTag.Attributes["id"]?.Value!;
             scene.ModPack = modPackName ?? modPackPattern.Match(file).Groups["pack"].Value ?? "";
 
@@ -65,7 +65,7 @@ foreach (var file in files)
             {
                 if (sceneTag["anim"].Attributes["t"].Value == "T" && sceneTag["anim"].Attributes["dest"] != null)
                 {
-                    scene.Destination = sceneTag["anim"].Attributes["dest"].Value;
+                    scene.Destination = sceneTag["anim"].Attributes["dest"].Value.Replace("|","_");
                 }
             }
 
@@ -88,7 +88,7 @@ foreach (var file in files)
                             if (option is not { Name: "option" }) continue;
                             scene.Navigations.Add(new Navigation()
                             {
-                                Destination = option!.Attributes!["go"]?.Value,
+                                Destination = option!.Attributes!["go"]?.Value.Replace("|","_"),
                                 //TODO: Convert navigation texts
                                 Description = option!.Attributes["text"].Value
                             });
