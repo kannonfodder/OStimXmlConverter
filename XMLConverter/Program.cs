@@ -90,7 +90,7 @@ foreach (var file in files)
                             {
                                 Destination = option!.Attributes!["go"]?.Value.Replace("|","_"),
                                 //TODO: Convert navigation texts
-                                Description = option!.Attributes["text"].Value
+                                Description =  option!.Attributes["text"].Value.StartsWith("^") ? null : option!.Attributes["text"].Value
                             });
                         }
                     }

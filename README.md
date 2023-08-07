@@ -12,7 +12,21 @@ Run the tool with `XmlConverter.exe <input> <output> <modpackname>` or omit the 
 
 It will trawl the folders for valid scene files, convert them to json and dump them into the output folder
 
+### Additional manual steps
+The following properties cannot be done by the script as they'll need to be worked out manually by the animator:
 
+Navigations:
+- Priority
+- Icon
+- Border
+- New Descriptions (It ignores descriptions in old OSA ^...)
+- No Warnings
+
+Actor:
+- Type
+- IntendedSex
+
+### Changes 
 V0.1:
 - Scene:
   - Name

@@ -24,7 +24,7 @@ public class Navigation
     public string Destination { get; set; }
     public string Origin { get; set; }
     public int Priority { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public string Icon { get; set; }
     public string Border { get; set; }
     public bool NoWarnings { get; set; }
